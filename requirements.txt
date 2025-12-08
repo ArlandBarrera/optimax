@@ -1,2 +1,6 @@
+easyocr
 pyaudio
 vosk
+pytesseract
+pillow
+pdf2image
