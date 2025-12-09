@@ -1,13 +1,32 @@
 import easyocr
 import os
+from typing import List
 
-# this needs to run only once to load the model into memory
-reader = easyocr.Reader(['es','en'])
+reader = easyocr.Reader(['es', 'en'])
 
-DIR = 'tools/imgocr/images/'
-FILE = 'shoes.jpg'
-PATH_IMG = os.path.join(DIR, FILE)
+def extract_text_from_image(image_path: str) -> List[str]:
+    """
+    Extrae texto de una imagen y retorna una lista de tokens.
 
-result = reader.readtext(PATH_IMG, detail = 0)
+    Args:
+        image_path: Ruta de la imagen a procesar
 
-print(result)
+    Returns:
+        Lista de tokens extraídos de la imagen
+    """
+    if not os.path.exists(image_path):
+        print(f"Error: La imagen {image_path} no existe")
+        return []
+
+    try:
+        result = reader.readtext(image_path, detail=0)
+        tokens = []
+        for text in result:
+            tokens.extend(text.lower().split())
+
+        print(f"Tokens extraídos de imagen: {len(tokens)}")
+        return tokens
+    except Exception as e:
+        print(f"Error al procesar imagen: {e}")
+        return []
+

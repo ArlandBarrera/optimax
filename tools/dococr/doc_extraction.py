@@ -3,50 +3,35 @@ import pytesseract
 from typing import List
 import os
 
-# --- Document ---
-DIR = 'tools/dococr/documents/'
-FILE = 'jotform.pdf'
-PATH_FILE = os.path.join(DIR, FILE)
+def extract_text_from_pdf(pdf_path: str) -> List[str]:
+    """
+    Extrae texto de un PDF y retorna una lista de tokens.
 
-def extract_text_from_pdf(PATH_FILE: str) -> List[str]:
+    Args:
+        pdf_path: Ruta del archivo PDF a procesar
+
+    Returns:
+        Lista de tokens extraídos del PDF
+    """
     full_text_list = []
 
-    # 1. Convert PDF pages to a list of PIL Image objects
-    # Note: pdf2image needs the Poppler library (installed with 'pacman -S poppler')
-    try:
-        # Setting a higher DPI (e.g., 300) often improves OCR accuracy significantly
-        print(f"Converting pages from {PATH_FILE}...")
-        images = convert_from_path(PATH_FILE, dpi=300)
-    except Exception as e:
-        print("Error: Could not convert PDF. Ensure Poppler is installed.")
-        print(f"Underlying error: {e}")
+    if not os.path.exists(pdf_path):
+        print(f"Error: El archivo {pdf_path} no existe")
         return []
 
-    # 2. Process each image/page
+    try:
+        print(f"Convirtiendo páginas de {pdf_path}...")
+        images = convert_from_path(pdf_path, dpi=300)
+    except Exception as e:
+        print("Error: No se pudo convertir el PDF. Asegúrese de que Poppler esté instalado.")
+        print(f"Error subyacente: {e}")
+        return []
+
     for i, image in enumerate(images):
-        print(f"Processing Page {i+1}...")
-
-        # Use Tesseract to run OCR on the PIL Image object
-        # You can specify languages if needed: lang='eng+spa'
+        print(f"Procesando Página {i+1}...")
         page_text = pytesseract.image_to_string(image)
+        full_text_list.extend(page_text.lower().split())
 
-        # Split the text into tokens (words) and add them to the main list
-        full_text_list.extend(page_text.split())
-
-    print("\nOCR Complete.")
+    print(f"OCR Completo. Total de tokens: {len(full_text_list)}")
     return full_text_list
 
-
-if os.path.exists(PATH_FILE):
-    ocr_result_tokens = extract_text_from_pdf(PATH_FILE)
-
-    if ocr_result_tokens:
-        print(f"Total tokens extracted: {len(ocr_result_tokens)}")
-        print("First 20 tokens:")
-        print(ocr_result_tokens[:20])
-
-        # This output format (List[str]) is now ready for your robust data extraction function!
-        # final_data = extract_final_receipt_values(ocr_result_tokens, ['SUB', 'TOTAL'])
-
-else:
-    print(f"\nError: Please ensure a PDF file named '{FILE}' exists in the current directory.")

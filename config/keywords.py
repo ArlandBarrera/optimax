@@ -1,1 +1,1 @@
-keywords_list = ['Previous', 'Current', 'Tax', 'Total', 'SUBTTL', 'ITBMS', 'VENTA']
+keywords_list = ['previous', 'current', 'subttl', 'venta', 'tax', 'impuesto', 'itbms', 'total']
